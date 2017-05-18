@@ -308,7 +308,7 @@ _start:
 
                 add ebx, eax ;counter
 
-                add edx, 8 ;move to next index in array (next grade)
+                add edx, 4 ;move to next index in array (next grade)
 
                 dec ecx ;decrement # of students til 0
                 jg .std_dev_loop
@@ -316,11 +316,12 @@ _start:
             ;ebx holds the sum of squares
             mov ecx, [students_saved]
             dec ecx ;need to divide sum by n-1
-            mov eax, [ebx]
+
+            mov eax, ebx
             idiv ecx ;divides sum of squares by n-1
 
-            ;mov edi, [eax] ;mov sum of squares divided by n-1 to edi for sqr func
-            ;call isqrt32
+            mov edi, [eax] ;mov sum of squares divided by n-1 to edi for sqr func
+            call isqrt32
 
             call iprintLF
 
