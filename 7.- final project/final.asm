@@ -20,7 +20,7 @@ segment .data
     msg_max DB "Highest grade: ",0x0
     msg_min DB "Lowest grade: ",0x0
     msg_stddev DB "Standard Deviation: ",0x0
-
+    msg_no_valid DB "### Grade not valid ###", 0x0
     msg_empty DB "### No students saved  ###",0x0
     msg_name_file DB "Name file: ",0x0
 
@@ -162,7 +162,8 @@ _start:
     ;====================== Capture Grades ===============================
     capture_grades:
         mov ecx, [students_saved] ;# of studens
-
+        cmp ecx, 0
+        je empty_array
         mov esi, array ;student names
         mov edx, array_grades ;student grades
 
@@ -180,8 +181,11 @@ _start:
             mov edx, grade_buffer_len ;gets registers ready for input
             call readText ;reads input
             mov eax, grade_buffer ;moves input to eax
+            
+            
             call atoi ;converts grade input to int
-
+            cmp eax, 101
+            jge not_valid
             pop edx ;recover array_grades
             mov [edx], eax ;mov grade to array_grades
             add esi, 30 ;for student names
@@ -292,7 +296,7 @@ _start:
 
                 add ebx, eax ;counter
 
-                add edx, 4 ;move to next index in array (next grade)
+                add edx, 8 ;move to next index in array (next grade)
 
                 dec ecx ;decrement # of students til 0
                 jg .std_dev_loop
@@ -300,12 +304,11 @@ _start:
             ;ebx holds the sum of squares
             mov ecx, [students_saved]
             dec ecx ;need to divide sum by n-1
-
-            mov eax, ebx
+            mov eax, [ebx]
             idiv ecx ;divides sum of squares by n-1
 
-            mov edi, [eax] ;mov sum of squares divided by n-1 to edi for sqr func
-            call isqrt32
+            ;mov edi, [eax] ;mov sum of squares divided by n-1 to edi for sqr func
+            ;call isqrt32
 
             call iprintLF
 
@@ -428,7 +431,10 @@ empty_array:
 
 
 
-
+not_valid:
+    mov eax, msg_no_valid
+    call sprintLF
+    jmp capture_grades
 
 
 
